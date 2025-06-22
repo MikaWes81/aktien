@@ -14,6 +14,7 @@ sbkey = os.getenv('Key')
 supabase = supabase.create_client(sburl, sbkey)
 operaingsystem = platform.system()
 credits_response = None
+userid = None
 
 
 def style(word):
@@ -48,7 +49,26 @@ def clear():
     else:
         os.system("clear")
 
+def fetch_amount():
+    TABELLENNAME = "balance"
+    try:
 
+        # Daten abrufen: Filtere nach userid und wähle nur die Spalte 'amount' aus
+        # Angenommen, die Spalte für die User-ID heißt 'userid'
+        response = supabase.table(TABELLENNAME).select("amount").eq("userid", userid).execute()
+
+        # Überprüfen, ob Daten vorhanden sind
+        if response.data:
+            amounts = [item["amount"] for item in response.data if "amount" in item and isinstance(item["amount"], (int, float))]
+            total_amount = sum(amounts)
+            return total_amount
+        else:
+            print(f"Keine Daten für User-ID '{userid}' in Tabelle '{TABELLENNAME}' gefunden.")
+            return 0.0
+
+    except Exception as e:
+        print(f"Fehler beim Abrufen der Daten: {e}")
+        return 0.0
 
 def auth():
     style("Welcome")
@@ -64,15 +84,47 @@ def auth():
         credits_response = supabase.auth.sign_in_with_password({
             "email": mail,
             "password": password,
+
         })
+        user_id = credits_response.user.id
+
         return
     else:
         return
+
+def view_balance():
+    style("Balance")
+    print("Your Balance: " + str(fetch_amount()))
+    print("[1] Make an Transaction")
+    print("[2] Main Menu")
+    inp = input()
+    match inp:
+        case "2":
+            return
+
+
+def main_menu():
+    style("Main Menu")
+    print("[1] View Acount Balance")
+    print("[2] Make an Tranceaktion")
+    print("[3] Start an Buisness")
+    print("[4] Editing Buisness")
+    print("[5] Buy shares")
+    print("[6] Logout")
+    inp = input()
+    match inp:
+        case "1":
+            clear()
+            view_balance()
+
+
 
 
 
 def main():
     auth()
+    clear()
+    main_menu()
 
 main()
 
