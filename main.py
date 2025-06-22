@@ -51,6 +51,7 @@ def clear():
 
 def fetch_amount():
     TABELLENNAME = "balance"
+    print(userid)
     try:
 
         # Daten abrufen: Filtere nach userid und wähle nur die Spalte 'amount' aus
@@ -71,6 +72,8 @@ def fetch_amount():
         return 0.0
 
 def auth():
+    global credits_response
+    global userid
     style("Welcome")
     print("[1] Login")
     print("[2] Exit")
@@ -86,7 +89,7 @@ def auth():
             "password": password,
 
         })
-        user_id = credits_response.user.id
+        userid = credits_response.user.id
 
         return
     else:
@@ -94,14 +97,13 @@ def auth():
 
 def view_balance():
     style("Balance")
-    print("Your Balance: " + str(fetch_amount()))
+    print("Your Balance: " + str(fetch_amount()) + "€")
     print("[1] Make an Transaction")
     print("[2] Main Menu")
     inp = input()
     match inp:
         case "2":
             return
-
 
 def main_menu():
     style("Main Menu")
@@ -117,11 +119,8 @@ def main_menu():
             clear()
             view_balance()
 
-
-
-
-
 def main():
+    clear()
     auth()
     clear()
     main_menu()
