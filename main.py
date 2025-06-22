@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import os
 import supabase
 import platform
+import json
 
 load_dotenv()
 #env data
@@ -12,7 +13,34 @@ sbkey = os.getenv('Key')
 # Global Viables
 supabase = supabase.create_client(sburl, sbkey)
 operaingsystem = platform.system()
-size = os.get_terminal_size().columns
+credits_response = None
+
+
+def style(word):
+    terminal_width = os.get_terminal_size().columns
+
+    effective_width_for_content = terminal_width - 4
+
+    if len(word) >= effective_width_for_content:
+        if len(word) > effective_width_for_content:
+            word = word[:effective_width_for_content - 3] + "..."
+        padding_length = effective_width_for_content - len(word)
+        left_padding = padding_length // 2
+        right_padding = padding_length - left_padding
+
+        centered_string_content = "=" * left_padding + word + "=" * right_padding
+        final_string = "<" + centered_string_content + ">"
+        print(final_string)
+        return
+
+    padding_length = effective_width_for_content - len(word)
+    left_padding = padding_length // 2
+    right_padding = padding_length - left_padding
+
+    centered_string_content = "=" * left_padding + word + "=" * right_padding
+    final_string = "<" + centered_string_content + ">"
+    print(final_string)
+
 
 def clear():
     if operaingsystem == "Windows":
@@ -20,39 +48,31 @@ def clear():
     else:
         os.system("clear")
 
-def pruefe_gerade_ungerade(zahl):
-    if zahl % 2 == 0:
-        return True
+
+
+def auth():
+    style("Welcome")
+    print("[1] Login")
+    print("[2] Exit")
+    inp = input()
+    if inp == "1":
+        clear()
+        style("Login")
+        headmail = input("Username: ")
+        mail = headmail.strip().lower() + ".projektaktien@gmail.com"
+        password = input("Password: ").strip()
+        credits_response = supabase.auth.sign_in_with_password({
+            "email": mail,
+            "password": password,
+        })
+        return
     else:
-        return False
-
-def style(word):
-    terminal_width = os.get_terminal_size().columns
-
-    if len(word) >= terminal_width:
-        print(word)
         return
 
-    padding_length = terminal_width - len(word)
-    left_padding = padding_length // 2
-    right_padding = padding_length - left_padding
 
-    centered_string = "=" * left_padding + word + "=" * right_padding
-    print(centered_string)
-
-        
-
-#def auth():
-#
-#    credits_response = supabase.auth.sign_in_with_password(
-#    {
-#        "email": mail,
-#        "password": password,
-#    }
-#)
 
 def main():
-    style("Willkommen")
+    auth()
 
 main()
 
