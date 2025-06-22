@@ -26,24 +26,19 @@ def pruefe_gerade_ungerade(zahl):
     else:
         return False
 
-def style(text):
-    lenth_text = len(text)
-    if pruefe_gerade_ungerade(size - int(lenth_text)) == False:
-        print_gleich = size - lenth_text
-        print_gleich = print_gleich / 2
-        for i in range(print_gleich):
-            print("=", end="")
-        print(text)
-        for i in range(print_gleich):
-            print("=", end="")
-    else:
-        print_gleich = size - lenth_text - 1
-        print_gleich = print_gleich / 2
-        for i in range(int(print_gleich)):
-            print("=", end="")
-        print(text)
-        for i in range(int(print_gleich)+1):
-            print("=", end="")
+def style(word):
+    terminal_width = os.get_terminal_size().columns
+
+    if len(word) >= terminal_width:
+        print(word)
+        return
+
+    padding_length = terminal_width - len(word)
+    left_padding = padding_length // 2
+    right_padding = padding_length - left_padding
+
+    centered_string = "=" * left_padding + word + "=" * right_padding
+    print(centered_string)
 
         
 
