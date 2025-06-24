@@ -1,5 +1,3 @@
-from logging import debug
-
 from dotenv import load_dotenv
 import os
 import supabase
@@ -10,7 +8,7 @@ load_dotenv()
 #env data
 sburl = os.getenv('URL')
 sbkey = os.getenv('Key')
-debug = os.getenv('DEBUG')
+debugv = os.getenv('DEBUG')
 
 
 # Global Viables
@@ -29,7 +27,7 @@ def style(word):
         if len(word) > effective_width_for_content:
             word = word[:effective_width_for_content - 3] + "..."
         padding_length = effective_width_for_content - len(word)
-        left_padding = padding_length // 2
+        left_padding: int = padding_length // 2
         right_padding = padding_length - left_padding
 
         centered_string_content = "=" * left_padding + word + "=" * right_padding
@@ -54,7 +52,7 @@ def clear():
 
 def fetch_amount():
     tabellenname = "balance"
-    if debug == 1:
+    if debugv == 1:
         print(userid)
     try:
         response = supabase.table(tabellenname).select("amount").eq("userid", userid).execute()
@@ -70,7 +68,7 @@ def fetch_amount():
 
     except Exception as e:
         print(f"Fail to load Data")
-        if debug == 1:
+        if debugv == 1:
             print(e)
         return 0.0
 def auth():
@@ -97,7 +95,7 @@ def auth():
             return
         except Exception as e:
             print(f"Fail to Login")
-            if debug ==1:
+            if debugv ==1:
                 print(e)
     else:
         return
