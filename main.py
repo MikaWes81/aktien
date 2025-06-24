@@ -1,13 +1,16 @@
+from logging import debug
+
 from dotenv import load_dotenv
 import os
 import supabase
 import platform
-import json
+
 
 load_dotenv()
 #env data
 sburl = os.getenv('URL')
 sbkey = os.getenv('Key')
+debug = os.getenv('DEBUG')
 
 
 # Global Viables
@@ -50,13 +53,11 @@ def clear():
         os.system("clear")
 
 def fetch_amount():
-    TABELLENNAME = "balance"
-    print(userid)
+    tabellenname = "balance"
+    if debug == 1:
+        print(userid)
     try:
-
-        # Daten abrufen: Filtere nach userid und wähle nur die Spalte 'amount' aus
-        # Angenommen, die Spalte für die User-ID heißt 'userid'
-        response = supabase.table(TABELLENNAME).select("amount").eq("userid", userid).execute()
+        response = supabase.table(tabellenname).select("amount").eq("userid", userid).execute()
 
         # Überprüfen, ob Daten vorhanden sind
         if response.data:
@@ -64,13 +65,14 @@ def fetch_amount():
             total_amount = sum(amounts)
             return total_amount
         else:
-            print(f"Keine Daten für User-ID '{userid}' in Tabelle '{TABELLENNAME}' gefunden.")
+            print(f"Keine Daten für User-ID '{userid}' in Tabelle '{tabellenname}' gefunden.")
             return 0.0
 
     except Exception as e:
-        print(f"Fehler beim Abrufen der Daten: {e}")
+        print(f"Fail to load Data")
+        if debug == 1:
+            print(e)
         return 0.0
-
 def auth():
     global credits_response
     global userid
@@ -79,19 +81,24 @@ def auth():
     print("[2] Exit")
     inp = input()
     if inp == "1":
-        clear()
-        style("Login")
-        headmail = input("Username: ")
-        mail = headmail.strip().lower() + ".projektaktien@gmail.com"
-        password = input("Password: ").strip()
-        credits_response = supabase.auth.sign_in_with_password({
-            "email": mail,
-            "password": password,
+        try:
+            clear()
+            style("Login")
+            headmail = input("Username: ")
+            mail = "projektaktien+" + headmail.strip().lower() + "@gmail.com"
+            password = input("Password: ").strip()
+            credits_response = supabase.auth.sign_in_with_password({
+                "email": mail,
+                "password": password,
 
-        })
-        userid = credits_response.user.id
+            })
+            userid = credits_response.user.id
 
-        return
+            return
+        except Exception as e:
+            print(f"Fail to Login")
+            if debug ==1:
+                print(e)
     else:
         return
 
