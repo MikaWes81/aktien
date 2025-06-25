@@ -51,20 +51,28 @@ def clear():
         os.system("clear")
 
 def fetch_amount():
-    tabellenname = "balance"
+    tabellenname = "transaction"
     if debugv == 1:
         print(userid)
     try:
-        response = supabase.table(tabellenname).select("amount").eq("userid", userid).execute()
-
+        empf_response = supabase.table(tabellenname).select("amount").eq("userid_empf", userid).execute()
+        send_response = supabase.table(tabellenname).select("amount").eq("userid_send", userid).execute()
         # Überprüfen, ob Daten vorhanden sind
-        if response.data:
-            amounts = [item["amount"] for item in response.data if "amount" in item and isinstance(item["amount"], (int, float))]
-            total_amount = sum(amounts)
-            return total_amount
+        if send_response.data:
+            send_amounts = [item["amount"] for item in send_response.data if "amount" in item and isinstance(item["amount"], (int, float))]
         else:
-            print(f"Keine Daten für User-ID '{userid}' in Tabelle '{tabellenname}' gefunden.")
+            if debugv == 1:
+                print(f"Keine Daten für User-ID '{userid}' in Tabelle '{tabellenname}' gefunden.")
             return 0.0
+        if send_response.data:
+            empf_amounts = [item["amount"] for item in empf_response.data if "amount" in item and isinstance(item["amount"], (int, float))]
+
+        else:
+            if debugv == 1:
+                print(f"Keine Daten für User-ID '{userid}' in Tabelle '{tabellenname}' gefunden.")
+            return 0.0
+        total_amount = sum(empf_amounts) - sum(send_amounts)
+        return total_amount
 
     except Exception as e:
         print(f"Fail to load Data")
@@ -92,13 +100,13 @@ def auth():
             })
             userid = credits_response.user.id
 
-            return
+            return 1
         except Exception as e:
             print(f"Fail to Login")
             if debugv ==1:
                 print(e)
     else:
-        return
+        return 0
 
 def view_balance():
     style("Balance")
@@ -126,9 +134,11 @@ def main_menu():
 
 def main():
     clear()
-    auth()
-    clear()
-    main_menu()
-
+    if auth() ==1:
+        clear()
+        main_menu()
+    else:
+        clear()
+        return
 main()
 
